@@ -243,18 +243,20 @@ export default function JobFinderSalaryDashboard() {
   if (!isMounted || !calculation) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FD] text-slate-800 font-sans w-full">
-      <main className="max-w-7xl mx-auto p-8 overflow-y-auto">
+    <div className="min-h-screen bg-background text-foreground font-sans w-full">
+      <main className="max-w-7xl mx-auto p-6 md:p-8 overflow-y-auto">
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Cześć, {user?.name || "Użytkowniku"} 👋
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              Cześć, {user?.name || "Użytkowniku"}
             </h1>
-            <p className="text-slate-500 text-sm">Twoja analiza finansowa,</p>
+            <p className="text-muted-foreground text-sm">
+              Twoja analiza finansowa
+            </p>
           </div>
         </header>
 
-        <div className="bg-white border border-slate-200 rounded-[24px] p-6 mb-8 flex flex-col lg:flex-row items-center gap-8">
+        <div className="bg-card text-card-foreground border border-border rounded-xl p-5 mb-6 flex flex-col lg:flex-row items-center gap-6 shadow-xs">
           <nav className="flex flex-col lg:flex-row gap-6 w-full items-center lg:items-end">
             <FilterSelect
               label="Lokalizacja"
@@ -294,13 +296,13 @@ export default function JobFinderSalaryDashboard() {
           </nav>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2 bg-white p-6 rounded-[24px] shadow-sm border border-slate-100">
-            <h2 className="font-semibold flex items-center gap-2 mb-6">
-              <Wallet className="text-indigo-500" size={20} /> Twoja Pensja
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+          <div className="lg:col-span-2 bg-card text-card-foreground p-5 rounded-xl shadow-xs border border-border">
+            <h2 className="font-semibold text-sm text-foreground flex items-center gap-2 mb-4">
+              <Wallet className="text-primary size-4" /> Twoja Pensja
             </h2>
 
-            <div className="flex items-center bg-slate-50 rounded-2xl p-2 border border-slate-100 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+            <div className="flex items-center bg-muted rounded-lg p-2 border border-border focus-within:ring-2 focus-within:ring-ring/30 transition-all">
               <input
                 type="number"
                 value={salaryInput}
@@ -309,7 +311,7 @@ export default function JobFinderSalaryDashboard() {
                   setSalaryInput(val);
                   syncSalaryToDb(val, salaryType);
                 }}
-                className="text-4xl font-black text-slate-800 focus:outline-none w-full bg-transparent px-4"
+                className="text-3xl font-bold text-foreground focus:outline-none w-full bg-transparent px-3"
               />
               <button
                 onClick={() => {
@@ -317,18 +319,18 @@ export default function JobFinderSalaryDashboard() {
                   setSalaryType(newType);
                   syncSalaryToDb(salaryInput, newType);
                 }}
-                className="bg-white border border-slate-200 rounded-xl px-4 py-2 font-bold text-indigo-600 shadow-sm hover:bg-slate-50 transition-colors uppercase"
+                className="bg-background border border-border rounded-md px-3 py-1.5 text-sm font-semibold text-primary hover:bg-accent transition-colors uppercase"
               >
                 {salaryType}
               </button>
             </div>
 
-            <div className="flex gap-6 mt-6 px-2">
+            <div className="flex gap-6 mt-4 px-1">
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Szacowane Netto
                 </span>
-                <span className="font-bold text-slate-600">
+                <span className="font-semibold text-foreground">
                   {Math.round(calculation.currentNetto)} zł
                 </span>
               </div>
@@ -336,15 +338,15 @@ export default function JobFinderSalaryDashboard() {
           </div>
 
           <div
-            className={`p-6 rounded-[24px] shadow-sm border ${calculation.balance > 0 ? "bg-indigo-600 text-white" : "bg-red-500 text-white"}`}
+            className={`p-5 rounded-xl shadow-xs border ${calculation.balance > 0 ? "bg-primary text-primary-foreground border-primary" : "bg-destructive text-primary-foreground border-destructive"}`}
           >
-            <h2 className="font-medium opacity-80 mb-1">
+            <h2 className="font-medium text-sm opacity-90 mb-1">
               Zostaje na czysto (Netto)
             </h2>
-            <div className="text-4xl font-black mb-4">
+            <div className="text-3xl font-bold mb-3">
               {Math.round(calculation.balance)} zł
             </div>
-            <p className="text-sm opacity-90 font-medium">
+            <p className="text-xs opacity-90 font-medium">
               {calculation.balance > 0
                 ? "Możesz odłożyć na marzenia!"
                 : "Przekraczasz budżet!"}
@@ -352,15 +354,15 @@ export default function JobFinderSalaryDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex flex-col">
-          <h3 className="font-semibold mb-4 flex items-center gap-2">
-            <TrendingDown size={20} className="text-orange-500" /> Dodatkowe
-            wydatki miesięczne (subskrybcje)
+        <div className="bg-card text-card-foreground p-5 rounded-xl shadow-xs border border-border flex flex-col mb-6">
+          <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+            <TrendingDown className="size-4 text-primary" /> Dodatkowe wydatki
+            miesięczne (subskrypcje)
           </h3>
-          <div className="flex flex-col gap-3 mb-6">
+          <div className="flex flex-col gap-2 mb-4">
             <input
               placeholder="Np. Netflix, Siłownia, Leasing"
-              className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="bg-background border border-input rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
               value={newExpenseTitle}
               onChange={(e) => setNewExpenseTitle(e.target.value)}
             />
@@ -368,17 +370,17 @@ export default function JobFinderSalaryDashboard() {
               <input
                 type="number"
                 placeholder="Kwota (zł)"
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"
+                className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
                 value={newExpenseAmount}
                 onChange={(e) => setNewExpenseAmount(e.target.value)}
               />
               <button
                 onClick={addExpense}
                 disabled={isAddingExpense}
-                className="bg-slate-900 text-white px-6 rounded-xl font-bold hover:bg-black transition-colors disabled:opacity-50"
+                className="bg-primary text-primary-foreground px-5 rounded-md text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {isAddingExpense ? (
-                  <Loader2 className="animate-spin" size={18} />
+                  <Loader2 className="animate-spin size-4" />
                 ) : (
                   "Dodaj"
                 )}
@@ -386,126 +388,92 @@ export default function JobFinderSalaryDashboard() {
             </div>
           </div>
 
-          <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+          <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
             {personalExpenses.map((exp) => (
               <div
                 key={exp.id}
-                className="flex justify-between items-center p-3 bg-orange-50/50 rounded-xl border border-orange-100"
+                className="flex justify-between items-center p-3 bg-muted/50 rounded-md border border-border"
               >
                 <div className="flex flex-col">
-                  <span className="font-medium text-slate-700">
+                  <span className="font-medium text-foreground text-sm">
                     {exp.title}
                   </span>
-                  <span className="text-xs text-orange-600 font-bold">
+                  <span className="text-xs text-primary font-semibold">
                     {exp.amount} zł / mies.
                   </span>
                 </div>
                 <button
                   onClick={() => deleteExpense(exp.id)}
-                  className="text-slate-400 hover:text-red-500 transition-colors"
+                  className="text-muted-foreground hover:text-destructive transition-colors"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 className="size-4" />
                 </button>
               </div>
             ))}
             {personalExpenses.length === 0 && (
-              <p className="text-center text-slate-400 text-sm py-4 italic">
+              <p className="text-center text-muted-foreground text-sm py-4 italic">
                 Brak dodatkowych obciążeń.
               </p>
             )}
           </div>
         </div>
 
-        <div className="bg-white p-6 mb-8 rounded-[24px] shadow-sm border border-slate-100 flex flex-col">
-          <h3 className="font-semibold mb-6 flex items-center gap-2">
-            <TrendingDown size={20} className="text-red-500" /> Wykaz kosztów
+        <div className="bg-card text-card-foreground p-5 mb-6 rounded-xl shadow-xs border border-border flex flex-col">
+          <h3 className="font-semibold text-sm mb-5 flex items-center gap-2">
+            <TrendingDown className="size-4 text-destructive" /> Wykaz kosztów
           </h3>
 
-          <div className="space-y-4 flex-1">
-            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-slate-400 uppercase">
-                  Dach nad głową
-                </span>
-                <span className="font-semibold text-slate-700">
-                  {housing === "rent_room"
-                    ? "Wynajem pokoju"
-                    : housing === "rent_studio"
-                      ? "Własna kawalerka"
-                      : "Mieszkanie (2+ pokoje)"}
-                </span>
-              </div>
-              <span className="font-black text-red-500">
-                -{Math.round(calculation.rent)} zł
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-slate-400 uppercase">
-                  Przewidywane tryb wydawania pieniędzy na jedzenie i podstawowe
-                  przedmioty
-                </span>
-                <span className="font-semibold text-slate-700">
-                  {lifestyle}
-                </span>
-              </div>
-              <span className="font-black text-red-500">
-                -{calculation.foodAndLife.toFixed(0)} zł
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-slate-400 uppercase">
-                  Transport
-                </span>
-                <span className="font-semibold text-slate-700">
-                  Bilet w {city}
-                </span>
-              </div>
-              <span className="font-black text-red-500">
-                -{calculation.transport} zł
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center p-3 bg-orange-50 rounded-xl">
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-orange-400 uppercase">
-                  Własne wydatki
-                </span>
-              </div>
-              <span className="font-black text-red-500">
-                -{calculation.sumPersonalExpenses} zł
-              </span>
-            </div>
+          <div className="space-y-3 flex-1">
+            <CostRow
+              label="Dach nad głową"
+              value={
+                housing === "rent_room"
+                  ? "Wynajem pokoju"
+                  : housing === "rent_studio"
+                    ? "Własna kawalerka"
+                    : "Mieszkanie (2+ pokoje)"
+              }
+              amount={`-${Math.round(calculation.rent)} zł`}
+            />
+            <CostRow
+              label="Jedzenie i podstawy"
+              value={lifestyle}
+              amount={`-${calculation.foodAndLife.toFixed(0)} zł`}
+            />
+            <CostRow
+              label="Transport"
+              value={`Bilet w ${city}`}
+              amount={`-${calculation.transport} zł`}
+            />
+            <CostRow
+              label="Własne wydatki"
+              value="Subskrypcje i inne"
+              amount={`-${calculation.sumPersonalExpenses} zł`}
+              highlight
+            />
           </div>
 
-          <div className="mt-6 pt-6 border-t border-dashed border-slate-200">
+          <div className="mt-5 pt-5 border-t border-dashed border-border">
             <div className="flex justify-between items-center">
-              <span className="font-bold text-slate-900 text-lg">
+              <span className="font-semibold text-foreground">
                 Łączne wydatki:
               </span>
-              <span className="text-2xl font-black text-red-600">
-                {Math.round(calculation.totalCosts)}
-                zł
+              <span className="text-xl font-bold text-destructive">
+                {Math.round(calculation.totalCosts)} zł
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 mt-2 text-right uppercase tracking-widest font-bold">
-              Pieniądze nie dają szczęścia, ale ich brak daje smutek.
-            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Plus size={20} className="text-indigo-500" /> Dodaj nowy cel
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="bg-card text-card-foreground p-5 rounded-xl shadow-xs border border-border">
+            <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+              <Plus className="size-4 text-primary" /> Dodaj nowy cel
             </h3>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <input
                 placeholder="Nazwa (np. MacBook Pro)"
-                className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="bg-background border border-input rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
                 value={newGoalTitle}
                 onChange={(e) => setNewGoalTitle(e.target.value)}
               />
@@ -513,72 +481,91 @@ export default function JobFinderSalaryDashboard() {
                 <input
                   type="number"
                   placeholder="Cena (zł)"
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"
+                  className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
                   value={newGoalPrice}
                   onChange={(e) => setNewGoalPrice(e.target.value)}
                 />
                 <button
                   onClick={addGoal}
                   disabled={isAdding}
-                  className="bg-indigo-600 text-white px-6 rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                  className="bg-primary text-primary-foreground px-5 rounded-md text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
-                  {isAdding ? <Loader2 className="animate-spin" /> : "Dodaj"}
+                  {isAdding ? (
+                    <Loader2 className="animate-spin size-4" />
+                  ) : (
+                    "Dodaj"
+                  )}
                 </button>
               </div>
             </div>
 
-            <div className="mt-8">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
+            <div className="mt-6">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                 Twoje Cele
               </h3>
-              <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                 {goals.map((g) => (
                   <div
                     key={g.id}
                     onClick={() => setSelectedGoalId(g.id)}
-                    className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedGoalId === g.id ? "border-indigo-500 bg-indigo-50" : "border-slate-100 hover:border-slate-300"}`}
+                    className={`p-3 rounded-md border cursor-pointer transition-all ${
+                      selectedGoalId === g.id
+                        ? "border-primary bg-accent"
+                        : "border-border hover:border-foreground/20 bg-background"
+                    }`}
                   >
-                    <div className="flex justify-between items-start">
-                      <div className="flex flex-col">
-                        <span className="font-bold">{g.title}</span>
-                        <span className="text-indigo-600 font-black">
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-medium text-sm text-foreground truncate">
+                          {g.title}
+                        </span>
+                        <span className="text-primary font-semibold text-sm">
                           {g.price} zł
                         </span>
                       </div>
                       <button
                         onClick={(e) => deleteGoal(e, g.id)}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                       >
-                        <Trash2 size={28} />
+                        <Trash2 className="size-4" />
                       </button>
                     </div>
                   </div>
                 ))}
+                {goals.length === 0 && (
+                  <p className="text-center text-muted-foreground text-sm py-4 italic">
+                    Brak dodanych celów.
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-[24px] shadow-sm border border-slate-100 flex flex-col justify-center items-center text-center">
-            <Smartphone size={48} className="text-indigo-100 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Czas realizacji celu</h3>
+          <div className="bg-card text-card-foreground p-6 rounded-xl shadow-xs border border-border flex flex-col justify-center items-center text-center">
+            <div className="size-14 rounded-full bg-accent text-primary flex items-center justify-center mb-3">
+              <Smartphone className="size-6" />
+            </div>
+            <h3 className="text-lg font-semibold mb-1">Czas realizacji celu</h3>
             {calculation.selectedGoal ? (
               <>
-                <p className="text-slate-500 mb-6 font-medium">
+                <p className="text-muted-foreground text-sm mb-5">
                   Odkładając całą nadwyżkę na Twoje cele:
                 </p>
-                <div className="text-6xl font-black text-slate-800 mb-2">
+                <div className="text-5xl font-bold text-foreground mb-2 tracking-tight">
                   {calculation.monthsToGoal === Infinity
                     ? "∞"
                     : calculation.monthsToGoal}
-                  <span className="text-xl ml-2">mies.</span>
+                  <span className="text-lg ml-2 text-muted-foreground font-medium">
+                    mies.
+                  </span>
                 </div>
-                <p className="text-slate-400 text-sm italic">
+                <p className="text-muted-foreground text-xs italic">
                   To tylko {(calculation.monthsToGoal / 12).toFixed(1)} lat
                   Twojej młodości
                 </p>
               </>
             ) : (
-              <p className="text-slate-400">
+              <p className="text-muted-foreground text-sm">
                 Dodaj cel, aby sprawdzić kiedy go osiągniesz.
               </p>
             )}
@@ -589,16 +576,48 @@ export default function JobFinderSalaryDashboard() {
   );
 }
 
+function CostRow({
+  label,
+  value,
+  amount,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  amount: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={`flex justify-between items-center p-3 rounded-md ${
+        highlight ? "bg-accent" : "bg-muted/50"
+      }`}
+    >
+      <div className="flex flex-col min-w-0">
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+          {label}
+        </span>
+        <span className="font-medium text-foreground text-sm truncate">
+          {value}
+        </span>
+      </div>
+      <span className="font-semibold text-destructive text-sm flex-shrink-0">
+        {amount}
+      </span>
+    </div>
+  );
+}
+
 function FilterSelect({ label, icon, value, onChange, options, labels }: any) {
   return (
-    <div>
-      <label className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase mb-3">
+    <div className="w-full">
+      <label className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
         {icon} {label}
       </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20"
+        className="w-full h-10 px-3 bg-background border border-input rounded-md text-sm font-medium text-foreground outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring"
       >
         {options.map((o: string) => (
           <option key={o} value={o}>

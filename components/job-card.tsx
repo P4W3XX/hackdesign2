@@ -3,9 +3,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Heart, MapPin, Clock } from "lucide-react";
-import Image from "next/image";
+import { Heart, MapPin, Clock, Users, Banknote } from "lucide-react";
 import { JobModal } from "./job-modal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface JobOfferDB {
   id: string;
@@ -28,148 +30,113 @@ interface JobCardProps {
 
 export const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 600);
   };
 
-  const formattedDate = new Date(job.posted_date).toLocaleDateString("en-GB", {
+  const formattedDate = new Date(job.posted_date).toLocaleDateString("pl-PL", {
     day: "numeric",
-    month: "long",
+    month: "short",
   });
 
   return (
     <>
-      <style jsx>{`
-        @keyframes heartBeat {
-          0% {
-            transform: scale(1);
-          }
-          25% {
-            transform: scale(1.3);
-          }
-          50% {
-            transform: scale(1.1);
-          }
-          75% {
-            transform: scale(1.25);
-          }
-          100% {
-            transform: scale(1);
-          }
-        }
-        @keyframes pulse-ring {
-          0% {
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-          }
-          70% {
-            box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-          }
-        }
-        .heart-animate {
-          animation: heartBeat 0.6s ease-in-out;
-        }
-        .pulse-animate {
-          animation: pulse-ring 0.6s ease-out;
-        }
-      `}</style>
-
-      <div
-        className={`relative ${job.bg_color} border border-black/5 rounded-[32px] p-6 hover:shadow-2xl transition-all duration-500 w-full max-w-[340px] cursor-pointer group flex flex-col justify-between h-full`}
+      <Card
         onClick={() => setIsModalOpen(true)}
+        className="group cursor-pointer flex flex-col justify-between h-full transition-all hover:border-primary hover:shadow-md"
       >
-        <div>
-          {/* Salary */}
-          <div className="text-sm font-bold text-slate-500 mb-2">
-            {job.salary_gross.toLocaleString()} zł / month
-          </div>
-
-          {/* Title and Company */}
-          <div className="flex justify-between items-start gap-4 mb-4">
-            <div className="flex flex-col flex-1">  
-              <h3 className="text-xl font-black text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
-                {job.title}
-              </h3>
-              <p className="font-bold text-slate-600 opacity-80 mt-1">
-                {job.company}
-              </p>
+        <CardContent className="flex flex-col h-full gap-4">
+          {/* Top row: logo + company info */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0 flex-1">
+              <div className="size-11 rounded-lg bg-muted border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
+                <img
+                  src={job.logo_url || "/default-offer-photo.png"}
+                  alt={`${job.company} logo`}
+                  className="w-full h-full object-contain p-1.5"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-semibold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                  {job.title}
+                </h3>
+                <p className="text-sm text-muted-foreground mt-0.5 truncate">
+                  {job.company}
+                </p>
+              </div>
             </div>
-            <div className="bg-white p-2 rounded-2xl shadow-sm">
-              <img
-                src={job.logo_url || "/default-offer-photo.png"}
-                alt={`${job.company} logo`}
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-lg object-contain"
+            <button
+              onClick={handleLikeClick}
+              aria-label="Zapisz ofertę"
+              className={cn(
+                "flex-shrink-0 size-9 rounded-lg border flex items-center justify-center transition-all",
+                isFavorite
+                  ? "bg-primary border-primary text-primary-foreground"
+                  : "bg-background border-border text-muted-foreground hover:text-primary hover:border-primary"
+              )}
+            >
+              <Heart
+                className="size-4"
+                fill={isFavorite ? "currentColor" : "none"}
+                strokeWidth={2}
               />
-            </div>
+            </button>
           </div>
 
-          {/* Location */}
-          <div className="flex items-center gap-2 mb-3 text-slate-600 font-medium">
-            <MapPin size={16} className="text-slate-400" />
-            <span className="text-sm">{job.location}</span>
+          {/* Salary highlight */}
+          <div className="flex items-center gap-2 rounded-lg bg-accent px-3 py-2">
+            <Banknote className="size-4 text-primary" />
+            <span className="text-sm font-semibold text-accent-foreground">
+              {job.salary_gross.toLocaleString("pl-PL")} zł
+            </span>
+            <span className="text-xs text-muted-foreground">/ miesiąc</span>
           </div>
 
-          {/* Date and Applicants */}
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-6 pb-4 border-b border-black/10">
-            <div className="flex items-center gap-1.5 font-bold">
-              <Clock size={14} />
-              {formattedDate}
+          {/* Meta info */}
+          <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="size-3.5 flex-shrink-0" />
+              <span className="truncate">{job.location}</span>
             </div>
-            <div className="font-bold">{job.applicants_count} applicants</div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="size-3.5 flex-shrink-0" />
+              <span>{formattedDate}</span>
+            </div>
+            <div className="flex items-center gap-1.5 col-span-2">
+              <Users className="size-3.5 flex-shrink-0" />
+              <span>{job.applicants_count} kandydatów</span>
+            </div>
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {[job.employment_type, job.work_style, job.experience_level].map(
-              (tag) => (
+          <div className="flex flex-wrap gap-1.5">
+            {[job.employment_type, job.work_style, job.experience_level]
+              .filter(Boolean)
+              .map((tag) => (
                 <span
                   key={tag}
-                  className="px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-white/50 border border-black/5 text-slate-700"
+                  className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground"
                 >
                   {tag}
                 </span>
-              ),
-            )}
+              ))}
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3 mt-auto">
-          <button
-            className="flex-1 bg-slate-900 text-white py-3.5 rounded-2xl font-black text-sm hover:bg-black hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-slate-200"
+          {/* CTA */}
+          <Button
+            className="w-full mt-auto"
             onClick={(e) => {
               e.stopPropagation();
+              setIsModalOpen(true);
             }}
           >
-            Apply now
-          </button>
-
-          <button
-            onClick={handleLikeClick}
-            className={`p-3.5 rounded-2xl transition-all duration-300 border ${
-              isFavorite
-                ? "bg-red-500 border-red-500 text-white shadow-lg shadow-red-200"
-                : "bg-white border-black/5 text-slate-400 hover:text-red-500 hover:border-red-200"
-            } ${isAnimating ? "heart-animate" : ""} ${isFavorite && isAnimating ? "pulse-animate" : ""}`}
-          >
-            <Heart
-              size={20}
-              fill={isFavorite ? "currentColor" : "none"}
-              strokeWidth={isFavorite ? 0 : 2.5}
-            />
-          </button>
-        </div>
-      </div>
+            Zobacz szczegóły
+          </Button>
+        </CardContent>
+      </Card>
 
       <JobModal
         job={job as any}

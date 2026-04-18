@@ -1,13 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, useCallback } from "react";
+import { Briefcase, TrendingUp, CheckCircle2, ArrowRight } from "lucide-react";
 import { Menu } from "@/components/menu";
 import { JobsPage } from "@/components/jobs-page";
-import { CareerProgress } from "@/components/career-progress";
 import { careerLevels } from "./data/jobs";
 import { careerPaths } from "./data/careers";
 import { UserProgress, CareerPath } from "./types";
 import { CareerAiPath } from "@/components/career-path";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 // Static user progress data
 const userProgress: UserProgress = {
@@ -58,15 +67,7 @@ export default function Home() {
   const [categoryName, setCategoryName] = useState("");
   const [showCategoryForm, setShowCategoryForm] = useState(false);
 
-  // Custom career levels
   const [customLevels, setCustomLevels] = useState<any[]>([]);
-  const [showLevelForm, setShowLevelForm] = useState(false);
-  const [levelTitle, setLevelTitle] = useState("");
-  const [levelSalary, setLevelSalary] = useState({ current: 0, next: 0 });
-  const [levelRequirements, setLevelRequirements] = useState<string[]>([]);
-  const [levelSkills, setLevelSkills] = useState<string[]>([]);
-  const [newRequirement, setNewRequirement] = useState("");
-  const [newSkill, setNewSkill] = useState("");
 
   const handleToggleMenu = useCallback(() => {
     setIsMenuExpanded((prev) => !prev);
@@ -86,7 +87,7 @@ export default function Home() {
           name: categoryName.replace(/^[^\w\sąćęłńóśźż]+\s*/i, "").trim(),
           emoji: categoryName.charAt(0).match(/[\p{Emoji}]/u)
             ? categoryName.charAt(0)
-            : "📝",
+            : "",
           description: "Twoja niestandardowa ścieżka kariery",
           levels: customLevels.map((level, idx) => ({
             level: idx + 1,
@@ -100,64 +101,32 @@ export default function Home() {
         }
       : null;
 
-  const addLevel = () => {
-    if (
-      levelTitle.trim() &&
-      levelRequirements.length > 0 &&
-      levelSkills.length > 0
-    ) {
-      setCustomLevels([
-        ...customLevels,
-        {
-          title: levelTitle,
-          currentSalary: levelSalary.current,
-          nextSalary: levelSalary.next,
-          requirements: levelRequirements,
-          skills: levelSkills,
-        },
-      ]);
-      resetLevelForm();
-    }
-  };
-
-  const addRequirement = () => {
-    if (newRequirement.trim()) {
-      setLevelRequirements([...levelRequirements, newRequirement.trim()]);
-      setNewRequirement("");
-    }
-  };
-
-  const addSkill = () => {
-    if (newSkill.trim()) {
-      setLevelSkills([...levelSkills, newSkill.trim()]);
-      setNewSkill("");
-    }
-  };
-
-  const removeRequirement = (idx: number) => {
-    setLevelRequirements(levelRequirements.filter((_, i) => i !== idx));
-  };
-
-  const removeSkill = (idx: number) => {
-    setLevelSkills(levelSkills.filter((_, i) => i !== idx));
-  };
-
-  const resetLevelForm = () => {
-    setShowLevelForm(false);
-    setLevelTitle("");
-    setLevelSalary({ current: 0, next: 0 });
-    setLevelRequirements([]);
-    setLevelSkills([]);
-    setNewRequirement("");
-    setNewSkill("");
-  };
-
-  const removeLevel = (idx: number) => {
-    setCustomLevels(customLevels.filter((_, i) => i !== idx));
-  };
+  const homeTiles = [
+    {
+      icon: Briefcase,
+      title: "Porównaj oferty",
+      description:
+        "Łatwo porównuj warunki zatrudnienia, wynagrodzenie i benefity.",
+      page: "jobs" as const,
+    },
+    {
+      icon: TrendingUp,
+      title: "Ścieżka rozwoju",
+      description:
+        "Poznaj wymagania do awansu i wyższych zarobków dzięki AI.",
+      page: "career" as const,
+    },
+    {
+      icon: CheckCircle2,
+      title: "Walidacja formularza",
+      description:
+        "Sprawdź, czy formularz jest poprawnie wypełniony i zgodny z wymogami.",
+      page: "home" as const,
+    },
+  ];
 
   return (
-    <main className="flex min-h-screen">
+    <main className="flex min-h-screen bg-background">
       <Menu
         onNavigate={setCurrentPage}
         isExpanded={isMenuExpanded}
@@ -165,19 +134,20 @@ export default function Home() {
       />
 
       <div
-        className={`flex-1 overflow-auto transition-all duration-500 ease-in-out ${
-          isMenuExpanded ? "ml-90" : "ml-20"
-        }`}
+        className={cn(
+          "flex-1 overflow-auto transition-all duration-500 ease-in-out",
+          isMenuExpanded ? "ml-72" : "ml-20",
+        )}
       >
         {currentPage === "jobs" && <JobsPage />}
 
         {currentPage === "career" && (
           <div className="animate-in fade-in duration-500">
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-black text-slate-900 mb-4">
+            <div className="max-w-4xl mx-auto text-center pt-12 px-6">
+              <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight text-balance">
                 Twoja Ścieżka Awansu
               </h1>
-              <p className="text-slate-500 max-w-2xl mx-auto">
+              <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
                 Wykorzystujemy sztuczną inteligencję, aby przeanalizować Twoje
                 dane i stworzyć plan, który zaprowadzi Cię do wymarzonych
                 zarobków.
@@ -188,51 +158,51 @@ export default function Home() {
         )}
 
         {currentPage === "home" && (
-          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
-            <div className="max-w-4xl">
-              <h1 className="text-4xl font-bold text-white mb-4">
-                Witaj w panelu analiz
-              </h1>
-              <p className="text-slate-300 text-lg mb-8">
-                Wybierz funkcję z menu po lewej stronie, aby rozpocząć pracę z
-                narzędziami do analizy ofert pracy.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div
-                  onClick={() => setCurrentPage("jobs")}
-                  className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-blue-600 transition-all cursor-pointer hover:shadow-lg hover:shadow-blue-500/20"
-                >
-                  <div className="text-3xl mb-3">💼</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    Porównaj oferty
-                  </h3>
-                  <p className="text-slate-400">
-                    Łatwo porównuj warunki zatrudnienia, wynagrodzenie i
-                    benefity między różnymi ofertami pracy.
-                  </p>
+          <div className="min-h-screen bg-background p-8 md:p-12">
+            <div className="max-w-5xl mx-auto">
+              <div className="mb-10">
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-accent px-3 py-1 text-xs font-medium text-accent-foreground mb-4">
+                  <span className="size-1.5 rounded-full bg-primary" />
+                  Panel analiz
                 </div>
-                <div
-                  onClick={() => setCurrentPage("career")}
-                  className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-green-600 transition-all cursor-pointer hover:shadow-lg hover:shadow-green-500/20"
-                >
-                  <div className="text-3xl mb-3">🚀</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    Ścieżka rozwoju
-                  </h3>
-                  <p className="text-slate-400">
-                    Poznaj wymagania do awansu i zarobienia więcej pieniędzy.
-                  </p>
-                </div>
-                <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-cyan-600 transition-all cursor-pointer hover:shadow-lg hover:shadow-cyan-500/20">
-                  <div className="text-3xl mb-3">✅</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    Walidacja formularza
-                  </h3>
-                  <p className="text-slate-400">
-                    Sprawdź, czy formularz jest poprawnie wypełniony i zgodny z
-                    wymogami.
-                  </p>
-                </div>
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-3 text-balance">
+                  Witaj w panelu analiz
+                </h1>
+                <p className="text-muted-foreground text-lg max-w-2xl text-pretty">
+                  Wybierz funkcję z menu po lewej stronie, aby rozpocząć pracę z
+                  narzędziami do analizy ofert pracy.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {homeTiles.map((tile) => {
+                  const Icon = tile.icon;
+                  return (
+                    <Card
+                      key={tile.title}
+                      onClick={() => setCurrentPage(tile.page)}
+                      className="group cursor-pointer transition-all hover:border-primary hover:shadow-md"
+                    >
+                      <CardHeader>
+                        <div className="flex size-11 items-center justify-center rounded-lg bg-accent text-primary mb-2 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="size-5" />
+                        </div>
+                        <CardTitle className="text-xl">{tile.title}</CardTitle>
+                        <CardDescription>{tile.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-primary hover:text-primary hover:bg-accent -ml-2.5"
+                        >
+                          Przejdź
+                          <ArrowRight className="size-4" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           </div>

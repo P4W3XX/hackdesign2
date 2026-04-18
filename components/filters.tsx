@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Zap, 
-  ChevronDown, 
-  Briefcase, 
-  Globe, 
+import {
+  SlidersHorizontal,
+  ChevronDown,
+  Briefcase,
+  Globe,
   RotateCcw,
-  Banknote
+  Banknote,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 import {
   useSalaryRange,
   useEmploymentType,
@@ -22,7 +25,9 @@ import { createClient } from "@/lib/supabase/client";
 
 export const Filters: React.FC = () => {
   const [maxSalaryInDb, setMaxSalaryInDb] = useState(30000);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({
     salary: true,
     employment: true,
     style: true,
@@ -31,7 +36,7 @@ export const Filters: React.FC = () => {
   const salaryRange = useSalaryRange();
   const employmentType = useEmploymentType();
   const workStyle = useWorkStyle();
-  
+
   const updateSalaryRange = useUpdateSalaryRange();
   const toggleEmploymentType = useToggleEmploymentType();
   const toggleWorkStyle = useToggleWorkStyle();
@@ -47,7 +52,7 @@ export const Filters: React.FC = () => {
         .order("salary_gross", { ascending: false })
         .limit(1)
         .single();
-      
+
       if (data) {
         setMaxSalaryInDb(data.salary_gross);
       }
@@ -55,19 +60,15 @@ export const Filters: React.FC = () => {
     fetchMaxSalary();
   }, [supabase]);
 
-  // Obsługa zmiany pensji MIN
   const handleMinSalaryChange = (value: string) => {
     const newMin = parseInt(value);
-    // Nie pozwól, aby MIN było większe niż obecne MAX
     if (newMin <= salaryRange[1]) {
       updateSalaryRange([newMin, salaryRange[1]]);
     }
   };
 
-  // Obsługa zmiany pensji MAX
   const handleMaxSalaryChange = (value: string) => {
     const newMax = parseInt(value);
-    // Nie pozwól, aby MAX było mniejsze niż obecne MIN
     if (newMax >= salaryRange[0]) {
       updateSalaryRange([salaryRange[0], newMax]);
     }
@@ -81,155 +82,187 @@ export const Filters: React.FC = () => {
   const workStyleOptions = ["Office", "Hybrid", "Remote"];
 
   return (
-    <div className="flex flex-col bg-white h-full max-h-[80vh] overflow-y-auto shadow-xl rounded-2xl">
+    <div className="flex flex-col bg-popover text-popover-foreground border border-border rounded-xl shadow-lg max-h-[80vh] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-orange-600 fill-orange-600" />
-          <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Filtry</h2>
+          <SlidersHorizontal className="size-4 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground">
+            Filtry
+          </h2>
         </div>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={resetFilters}
-          className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-orange-600 transition-colors group"
+          className="gap-1.5 text-muted-foreground hover:text-foreground"
         >
-          <RotateCcw size={16} className="group-hover:rotate-[-45deg] transition-transform" />
+          <RotateCcw className="size-3.5" />
           Resetuj
-        </button>
+        </Button>
       </div>
 
-      <div className="flex-1">
-        {/* Sekcja: Wynagrodzenie (Dwa suwaki) */}
-        <div className="border-b">
-          <button
-            onClick={() => toggleSection("salary")}
-            className="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition group"
-          >
-            <div className="flex items-center gap-3 text-slate-700">
-              <Banknote className="w-5 h-5 text-orange-600" />
-              <span className="font-bold">Widełki płacowe (PLN)</span>
-            </div>
-            <ChevronDown
-              size={20}
-              className={`text-slate-400 transition-transform ${expandedSections.salary ? "rotate-180" : ""}`}
-            />
-          </button>
-          
-          {expandedSections.salary && (
-            <div className="px-5 pb-8 space-y-6">
-              <div className="flex justify-between items-center gap-4">
-                <div className="flex-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Od</label>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-black text-slate-700">
-                    {salaryRange[0].toLocaleString()} zł
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Do</label>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-black text-slate-700">
-                    {salaryRange[1].toLocaleString()} zł
-                  </div>
+      <div className="flex-1 overflow-y-auto">
+        {/* Salary */}
+        <Section
+          icon={Banknote}
+          label="Widełki płacowe (PLN)"
+          expanded={expandedSections.salary}
+          onToggle={() => toggleSection("salary")}
+        >
+          <div className="px-4 pb-5 space-y-5">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
+                  Od
+                </label>
+                <div className="bg-muted border border-border rounded-md px-3 py-2 text-sm font-semibold text-foreground">
+                  {salaryRange[0].toLocaleString("pl-PL")} zł
                 </div>
               </div>
-
-              <div className="space-y-4">
-                {/* Suwak MIN */}
-                <div className="relative">
-                  <input
-                    type="range"
-                    min="0"
-                    max={maxSalaryInDb}
-                    step="500"
-                    value={salaryRange[0]}
-                    onChange={(e) => handleMinSalaryChange(e.target.value)}
-                    className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-orange-600"
-                  />
-                  <p className="text-[9px] text-slate-400 mt-1 font-bold uppercase tracking-tighter">Ustaw minimum</p>
-                </div>
-
-                {/* Suwak MAX */}
-                <div className="relative">
-                  <input
-                    type="range"
-                    min="0"
-                    max={maxSalaryInDb}
-                    step="500"
-                    value={salaryRange[1]}
-                    onChange={(e) => handleMaxSalaryChange(e.target.value)}
-                    className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-orange-600"
-                  />
-                  <p className="text-[9px] text-slate-400 mt-1 font-bold uppercase tracking-tighter">Ustaw maksimum</p>
+              <div>
+                <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mb-1 block">
+                  Do
+                </label>
+                <div className="bg-muted border border-border rounded-md px-3 py-2 text-sm font-semibold text-foreground">
+                  {salaryRange[1].toLocaleString("pl-PL")} zł
                 </div>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Sekcja: Typ umowy */}
-        <div className="border-b">
-          <button
-            onClick={() => toggleSection("employment")}
-            className="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition group"
-          >
-            <div className="flex items-center gap-3 text-slate-700">
-              <Briefcase className="w-5 h-5 text-orange-600" />
-              <span className="font-bold">Typ umowy</span>
+            <div className="space-y-3">
+              <div>
+                <input
+                  type="range"
+                  min="0"
+                  max={maxSalaryInDb}
+                  step="500"
+                  value={salaryRange[0]}
+                  onChange={(e) => handleMinSalaryChange(e.target.value)}
+                  className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">
+                  Minimum
+                </p>
+              </div>
+              <div>
+                <input
+                  type="range"
+                  min="0"
+                  max={maxSalaryInDb}
+                  step="500"
+                  value={salaryRange[1]}
+                  onChange={(e) => handleMaxSalaryChange(e.target.value)}
+                  className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">
+                  Maksimum
+                </p>
+              </div>
             </div>
-            <ChevronDown
-              size={20}
-              className={`text-slate-400 transition-transform ${expandedSections.employment ? "rotate-180" : ""}`}
-            />
-          </button>
+          </div>
+        </Section>
 
-          {expandedSections.employment && (
-            <div className="px-5 pb-4 grid grid-cols-1 gap-2">
-              {employmentTypeOptions.map((option) => (
-                <label key={option} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/30 cursor-pointer transition group">
-                  <span className="text-sm font-bold text-slate-600 group-hover:text-orange-700">{option}</span>
-                  <input
-                    type="checkbox"
-                    checked={employmentType.includes(option)}
-                    onChange={() => toggleEmploymentType(option)}
-                    className="w-5 h-5 rounded-lg border-2 border-slate-300 text-orange-600 cursor-pointer focus:ring-orange-500"
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Employment */}
+        <Section
+          icon={Briefcase}
+          label="Typ umowy"
+          expanded={expandedSections.employment}
+          onToggle={() => toggleSection("employment")}
+        >
+          <div className="px-4 pb-4 flex flex-col gap-1">
+            {employmentTypeOptions.map((option) => (
+              <CheckboxRow
+                key={option}
+                label={option}
+                checked={employmentType.includes(option)}
+                onChange={() => toggleEmploymentType(option)}
+              />
+            ))}
+          </div>
+        </Section>
 
-        {/* Sekcja: Tryb pracy */}
-        <div className="border">
-          <button
-            onClick={() => toggleSection("style")}
-            className="w-full p-5 flex items-center justify-between hover:bg-slate-50 transition group"
-          >
-            <div className="flex items-center gap-3 text-slate-700">
-              <Globe className="w-5 h-5 text-orange-600" />
-              <span className="font-bold">Tryb pracy</span>
-            </div>
-            <ChevronDown
-              size={20}
-              className={`text-slate-400 transition-transform ${expandedSections.style ? "rotate-180" : ""}`}
-            />
-          </button>
-
-          {expandedSections.style && (
-            <div className="px-5 pb-4 grid grid-cols-1 gap-2">
-              {workStyleOptions.map((option) => (
-                <label key={option} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/30 cursor-pointer transition group">
-                  <span className="text-sm font-bold text-slate-600 group-hover:text-orange-700">{option}</span>
-                  <input
-                    type="checkbox"
-                    checked={workStyle.includes(option)}
-                    onChange={() => toggleWorkStyle(option)}
-                    className="w-5 h-5 rounded-lg border-2 border-slate-300 text-orange-600 cursor-pointer focus:ring-orange-500"
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Work style */}
+        <Section
+          icon={Globe}
+          label="Tryb pracy"
+          expanded={expandedSections.style}
+          onToggle={() => toggleSection("style")}
+          last
+        >
+          <div className="px-4 pb-4 flex flex-col gap-1">
+            {workStyleOptions.map((option) => (
+              <CheckboxRow
+                key={option}
+                label={option}
+                checked={workStyle.includes(option)}
+                onChange={() => toggleWorkStyle(option)}
+              />
+            ))}
+          </div>
+        </Section>
       </div>
     </div>
   );
 };
+
+function Section({
+  icon: Icon,
+  label,
+  expanded,
+  onToggle,
+  children,
+  last,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+  last?: boolean;
+}) {
+  return (
+    <div className={cn(!last && "border-b border-border")}>
+      <button
+        onClick={onToggle}
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/60 transition-colors"
+      >
+        <div className="flex items-center gap-2.5 text-foreground">
+          <Icon className="size-4 text-primary" />
+          <span className="text-sm font-medium">{label}</span>
+        </div>
+        <ChevronDown
+          className={cn(
+            "size-4 text-muted-foreground transition-transform",
+            expanded && "rotate-180"
+          )}
+        />
+      </button>
+      {expanded && children}
+    </div>
+  );
+}
+
+function CheckboxRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <label
+      className={cn(
+        "flex items-center justify-between px-3 py-2 rounded-md border cursor-pointer transition-colors",
+        checked
+          ? "border-primary bg-accent text-accent-foreground"
+          : "border-transparent hover:border-border hover:bg-muted/50 text-foreground"
+      )}
+    >
+      <span className="text-sm font-medium">{label}</span>
+      <Checkbox checked={checked} onCheckedChange={onChange} />
+    </label>
+  );
+}
